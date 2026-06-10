@@ -4,7 +4,7 @@ import { useLang } from '../context/LanguageContext'
 import { useToast } from '../context/ToastContext'
 import { getDifficulty } from '../utils/level'
 
-const EMPTY_FORM = { title: '', description: '', points: 10 }
+const EMPTY_FORM = { title: '', description: '', points: 10, repeatable: false }
 
 export default function Tasks({ onPointsChange }) {
   const { t, lang } = useLang()
@@ -93,6 +93,18 @@ export default function Tasks({ onPointsChange }) {
           onChange={e => setForm(f => ({ ...f, points: Number(e.target.value) }))}
         />
         <button
+          type="button"
+          onClick={() => setForm(f => ({ ...f, repeatable: !f.repeatable }))}
+          title={t.tasks.repeatable}
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all border ${
+            form.repeatable
+              ? 'bg-violet-900/50 border-violet-600 text-violet-300'
+              : 'bg-slate-900 border-slate-600 text-slate-500 hover:border-slate-500 hover:text-slate-400'
+          }`}
+        >
+          🔁 {t.tasks.repeatable}
+        </button>
+        <button
           type="submit"
           className="bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-lg text-sm font-bold active:scale-95 transition-all"
         >
@@ -169,6 +181,12 @@ export default function Tasks({ onPointsChange }) {
               <span className={`shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${diff.cls}`}>
                 {diff.label}
               </span>
+
+              {task.repeatable ? (
+                <span className="shrink-0 text-xs text-violet-400 bg-violet-900/30 border border-violet-700/50 px-1.5 py-0.5 rounded-full" title={t.tasks.repeatable}>
+                  🔁
+                </span>
+              ) : null}
 
               <span className="shrink-0 text-xs font-black text-amber-400 bg-amber-900/30 border border-amber-700/50 px-2 py-1 rounded-full">
                 +{task.points} XP
