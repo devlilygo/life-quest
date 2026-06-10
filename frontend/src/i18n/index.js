@@ -14,6 +14,8 @@ export const translations = {
       toast: (title, pts) => `✅ "${title}" completed! +${pts} XP`,
       filters: { all: 'All', active: 'Active', completed: 'Completed' },
       active_count: n => `${n} active`,
+      repeatable: 'Repeat',
+      last_done: 'Last',
     },
     rewards: {
       title: 'Rewards',
@@ -26,6 +28,9 @@ export const translations = {
       not_enough: '⚠️ Not enough XP!',
       loading: 'Loading...',
       toast: (title, pts) => `🎁 "${title}" redeemed! −${pts} XP`,
+      repeatable: 'Reusable',
+      one_time: 'One-time',
+      claimed: 'Claimed',
     },
     history: {
       title: 'XP History',
@@ -71,6 +76,8 @@ export const translations = {
       toast: (title, pts) => `✅ "${title}" 완료! +${pts} XP`,
       filters: { all: '전체', active: '진행중', completed: '완료됨' },
       active_count: n => `${n}개 진행중`,
+      repeatable: '반복',
+      last_done: '최근',
     },
     rewards: {
       title: '보상',
@@ -83,6 +90,9 @@ export const translations = {
       not_enough: '⚠️ XP가 부족합니다!',
       loading: '불러오는 중...',
       toast: (title, pts) => `🎁 "${title}" 교환 완료! −${pts} XP`,
+      repeatable: '반복 사용',
+      one_time: '1회 사용',
+      claimed: '사용됨',
     },
     history: {
       title: 'XP 내역',

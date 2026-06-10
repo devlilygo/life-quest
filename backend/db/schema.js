@@ -29,6 +29,11 @@ function initSchema() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  // Migrations — safe to run on existing DBs
+  try { db.exec(`ALTER TABLE tasks ADD COLUMN repeatable INTEGER NOT NULL DEFAULT 0`) } catch (_) {}
+  try { db.exec(`ALTER TABLE rewards ADD COLUMN repeatable INTEGER NOT NULL DEFAULT 1`) } catch (_) {}
+  try { db.exec(`ALTER TABLE rewards ADD COLUMN redeemed_at DATETIME`) } catch (_) {}
 }
 
 module.exports = { initSchema };

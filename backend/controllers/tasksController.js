@@ -17,19 +17,19 @@ const getTask = (req, res) => {
 };
 
 const createTask = (req, res) => {
-  const { title, description, points = 10 } = req.body;
+  const { title, description, points = 10, repeatable = 0 } = req.body;
   if (!title) return res.status(400).json({ error: 'title is required' });
 
   const result = db
-    .prepare('INSERT INTO tasks (title, description, points) VALUES (?, ?, ?)')
-    .run(title, description ?? null, points);
+    .prepare('INSERT INTO tasks (title, description, points, repeatable) VALUES (?, ?, ?, ?)')
+    .run(title, description ?? null, points, repeatable ? 1 : 0);
 
   const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(result.lastInsertRowid);
   res.status(201).json(task);
 };
 
 const updateTask = (req, res) => {
-  const { title, description, points } = req.body;
+  const { title, description, points, repeatable } = req.body;
   const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id);
   if (!task) return res.status(404).json({ error: 'Task not found' });
 
@@ -37,9 +37,13 @@ const updateTask = (req, res) => {
     UPDATE tasks SET
       title = COALESCE(?, title),
       description = COALESCE(?, description),
-      points = COALESCE(?, points)
+      points = COALESCE(?, points),
+      repeatable = CASE WHEN ? IS NOT NULL THEN ? ELSE repeatable END
     WHERE id = ?
-  `).run(title ?? null, description ?? null, points ?? null, req.params.id);
+  `).run(title ?? null, description ?? null, points ?? null,
+         repeatable !== undefined ? 1 : null,
+         repeatable !== undefined ? (repeatable ? 1 : 0) : null,
+         req.params.id);
 
   res.json(db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id));
 };
@@ -55,19 +59,22 @@ const deleteTask = (req, res) => {
 const completeTask = (req, res) => {
   const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id);
   if (!task) return res.status(404).json({ error: 'Task not found' });
-  if (task.status === 'completed') {
+  if (task.status === 'completed' && !task.repeatable) {
     return res.status(400).json({ error: 'Task already completed' });
   }
 
   const complete = db.transaction(() => {
-    db.prepare(`
-      UPDATE tasks SET status = 'completed', completed_at = CURRENT_TIMESTAMP WHERE id = ?
-    `).run(task.id);
+    if (task.repeatable) {
+      // Keep pending so it can be completed again; just stamp the last completion time
+      db.prepare(`UPDATE tasks SET completed_at = CURRENT_TIMESTAMP WHERE id = ?`).run(task.id);
+    } else {
+      db.prepare(`UPDATE tasks SET status = 'completed', completed_at = CURRENT_TIMESTAMP WHERE id = ?`).run(task.id);
+    }
 
     db.prepare(`
       INSERT INTO point_history (amount, reason, reference_id, reference_type)
       VALUES (?, ?, ?, 'task')
-    `).run(task.points, `Task completed: ${task.title}`, task.id)
+    `).run(task.points, `Task completed: ${task.title}`, task.id);
   });
 
   complete();
