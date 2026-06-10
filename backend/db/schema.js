@@ -8,6 +8,7 @@ function initSchema() {
       description TEXT,
       points INTEGER NOT NULL DEFAULT 10,
       status TEXT NOT NULL DEFAULT 'pending',
+      repeatable INTEGER NOT NULL DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       completed_at DATETIME
     );
@@ -17,6 +18,7 @@ function initSchema() {
       title TEXT NOT NULL,
       description TEXT,
       points_required INTEGER NOT NULL,
+      repeatable INTEGER NOT NULL DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -30,10 +32,9 @@ function initSchema() {
     );
   `);
 
-  // Migrations — safe to run on existing DBs
+  // Migrations for existing DBs — safe to run multiple times
   try { db.exec(`ALTER TABLE tasks ADD COLUMN repeatable INTEGER NOT NULL DEFAULT 0`) } catch (_) {}
   try { db.exec(`ALTER TABLE rewards ADD COLUMN repeatable INTEGER NOT NULL DEFAULT 1`) } catch (_) {}
-  try { db.exec(`ALTER TABLE rewards ADD COLUMN redeemed_at DATETIME`) } catch (_) {}
 }
 
 module.exports = { initSchema };

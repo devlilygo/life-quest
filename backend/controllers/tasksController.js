@@ -59,25 +59,24 @@ const deleteTask = (req, res) => {
 const completeTask = (req, res) => {
   const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id);
   if (!task) return res.status(404).json({ error: 'Task not found' });
-  if (task.status === 'completed' && !task.repeatable) {
+
+  const isRepeatable = task.repeatable === 1;
+  if (task.status === 'completed' && !isRepeatable) {
     return res.status(400).json({ error: 'Task already completed' });
   }
 
-  const complete = db.transaction(() => {
-    if (task.repeatable) {
-      // Keep pending so it can be completed again; just stamp the last completion time
+  db.transaction(() => {
+    if (isRepeatable) {
+      // Status stays 'pending' so the quest can be completed again
       db.prepare(`UPDATE tasks SET completed_at = CURRENT_TIMESTAMP WHERE id = ?`).run(task.id);
     } else {
       db.prepare(`UPDATE tasks SET status = 'completed', completed_at = CURRENT_TIMESTAMP WHERE id = ?`).run(task.id);
     }
-
     db.prepare(`
       INSERT INTO point_history (amount, reason, reference_id, reference_type)
       VALUES (?, ?, ?, 'task')
     `).run(task.points, `Task completed: ${task.title}`, task.id);
-  });
-
-  complete();
+  })();
 
   const updated = db.prepare('SELECT * FROM tasks WHERE id = ?').get(task.id);
   res.json({ task: updated, points_earned: task.points, total_points: getTotalPoints() });
