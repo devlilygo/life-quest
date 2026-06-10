@@ -112,7 +112,8 @@ export default function Rewards({ onPointsChange, totalPoints }) {
           <p className="text-center text-slate-600 py-16 animate-slide-in">{t.rewards.empty}</p>
         )}
         {rewards.map((reward, i) => {
-          const isClaimed = !reward.repeatable && reward.redeemed_at
+          const isClaimed = reward.is_claimed === 1
+          const isRepeatable = reward.repeatable === 1
           const canRedeem = !isClaimed && totalPoints >= reward.points_required
           const progress = Math.min(100, Math.round((totalPoints / reward.points_required) * 100))
           const isRedeeming = redeemingId === reward.id
@@ -151,8 +152,10 @@ export default function Rewards({ onPointsChange, totalPoints }) {
                   )}
                 </div>
 
-                {/* One-time badge */}
-                {!reward.repeatable && (
+                {/* Repeatable / one-time badge */}
+                {isRepeatable ? (
+                  <span className="shrink-0 text-xs font-bold text-emerald-500 bg-emerald-900/20 border border-emerald-800/50 px-1.5 py-0.5 rounded-full">♾</span>
+                ) : (
                   <span className={`shrink-0 text-xs font-bold px-1.5 py-0.5 rounded-full border ${
                     isClaimed
                       ? 'text-slate-600 bg-slate-800 border-slate-700'

@@ -6,7 +6,19 @@ function getTotalPoints() {
 }
 
 const getAllRewards = (req, res) => {
-  const rewards = db.prepare('SELECT * FROM rewards ORDER BY points_required ASC').all();
+  // is_claimed: 1 when the reward is one-time and has been redeemed at least once
+  const rewards = db.prepare(`
+    SELECT r.*,
+      CASE
+        WHEN r.repeatable = 0 AND (
+          SELECT COUNT(*) FROM point_history
+          WHERE reference_id = r.id AND reference_type = 'reward'
+        ) > 0 THEN 1
+        ELSE 0
+      END AS is_claimed
+    FROM rewards r
+    ORDER BY r.points_required ASC
+  `).all();
   res.json(rewards);
 };
 
@@ -63,9 +75,16 @@ const redeemReward = (req, res) => {
   const reward = db.prepare('SELECT * FROM rewards WHERE id = ?').get(req.params.id);
   if (!reward) return res.status(404).json({ error: 'Reward not found' });
 
-  // One-time reward already claimed
-  if (!reward.repeatable && reward.redeemed_at) {
-    return res.status(400).json({ error: 'Reward already claimed' });
+  const isRepeatable = reward.repeatable === 1;
+
+  // One-time reward: block if already redeemed (check point_history as source of truth)
+  if (!isRepeatable) {
+    const count = db.prepare(
+      `SELECT COUNT(*) AS cnt FROM point_history WHERE reference_id = ? AND reference_type = 'reward'`
+    ).get(reward.id).cnt;
+    if (count > 0) {
+      return res.status(400).json({ error: 'Reward already claimed' });
+    }
   }
 
   const currentPoints = getTotalPoints();
@@ -82,13 +101,21 @@ const redeemReward = (req, res) => {
       INSERT INTO point_history (amount, reason, reference_id, reference_type)
       VALUES (?, ?, ?, 'reward')
     `).run(-reward.points_required, `Reward redeemed: ${reward.title}`, reward.id);
-
-    if (!reward.repeatable) {
-      db.prepare(`UPDATE rewards SET redeemed_at = CURRENT_TIMESTAMP WHERE id = ?`).run(reward.id);
-    }
   })();
 
-  const updated = db.prepare('SELECT * FROM rewards WHERE id = ?').get(reward.id);
+  // Return updated reward with is_claimed flag
+  const updated = db.prepare(`
+    SELECT r.*,
+      CASE
+        WHEN r.repeatable = 0 AND (
+          SELECT COUNT(*) FROM point_history
+          WHERE reference_id = r.id AND reference_type = 'reward'
+        ) > 0 THEN 1
+        ELSE 0
+      END AS is_claimed
+    FROM rewards r WHERE r.id = ?
+  `).get(reward.id);
+
   res.json({
     reward: updated,
     points_spent: reward.points_required,

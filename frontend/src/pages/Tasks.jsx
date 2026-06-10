@@ -138,6 +138,8 @@ export default function Tasks({ onPointsChange }) {
           const diff = getDifficulty(task.points, lang)
           const isCompleting = completingId === task.id
           const isDone = task.status === 'completed'
+          const isRepeatable = task.repeatable === 1
+          const locale = lang === 'ko' ? 'ko-KR' : 'en-US'
 
           return (
             <div
@@ -170,19 +172,28 @@ export default function Tasks({ onPointsChange }) {
               />
 
               <div className="flex-1 min-w-0">
-                <p className={`font-semibold text-sm truncate transition-all ${isDone ? 'line-through text-slate-600' : 'text-white'}`}>
-                  {task.title}
-                </p>
-                {task.description && (
-                  <p className="text-xs text-slate-500 mt-0.5 truncate">{task.description}</p>
-                )}
+                <div className="flex items-center gap-1.5">
+                  <p className={`font-semibold text-sm truncate transition-all ${isDone ? 'line-through text-slate-600' : 'text-white'}`}>
+                    {task.title}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 mt-0.5">
+                  {task.description && (
+                    <p className="text-xs text-slate-500 truncate">{task.description}</p>
+                  )}
+                  {isRepeatable && task.completed_at && (
+                    <p className="text-xs text-slate-600 shrink-0">
+                      {t.tasks.last_done}: {new Date(task.completed_at + 'Z').toLocaleString(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <span className={`shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${diff.cls}`}>
                 {diff.label}
               </span>
 
-              {task.repeatable ? (
+              {isRepeatable ? (
                 <span className="shrink-0 text-xs text-violet-400 bg-violet-900/30 border border-violet-700/50 px-1.5 py-0.5 rounded-full" title={t.tasks.repeatable}>
                   🔁
                 </span>
@@ -192,7 +203,7 @@ export default function Tasks({ onPointsChange }) {
                 +{task.points} XP
               </span>
 
-              {isDone ? (
+              {isDone && !isRepeatable ? (
                 <span className="shrink-0 text-xs text-emerald-500 font-bold">✓ {t.tasks.done}</span>
               ) : (
                 <button
