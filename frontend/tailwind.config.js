@@ -29,6 +29,10 @@ export default {
           '45%':  { transform: 'scale(1.18)' },
           '100%': { transform: 'scale(1)' },
         },
+        'fade-in': {
+          '0%':   { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
       },
       animation: {
         'slide-in':     'slide-in 0.25s ease-out both',
@@ -37,6 +41,7 @@ export default {
         'flash-purple': 'flash-purple 0.7s ease-in-out',
         'toast-in':     'toast-in 0.22s ease-out',
         'pop':          'pop 0.22s ease-in-out',
+        'fade-in':      'fade-in 0.5s ease-out',
       },
     },
   },

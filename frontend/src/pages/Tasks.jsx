@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react'
 import { api } from '../api'
 import { useLang } from '../context/LanguageContext'
 import { useToast } from '../context/ToastContext'
+import { getDifficulty } from '../utils/level'
 
 const EMPTY_FORM = { title: '', description: '', points: 10 }
 
 export default function Tasks({ onPointsChange }) {
-  const { t } = useLang()
+  const { t, lang } = useLang()
   const { addToast } = useToast()
   const [tasks, setTasks] = useState([])
   const [form, setForm] = useState(EMPTY_FORM)
@@ -116,8 +117,11 @@ export default function Tasks({ onPointsChange }) {
               )}
             </div>
 
+            <span className={`shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${getDifficulty(task.points, lang).cls}`}>
+              {getDifficulty(task.points, lang).label}
+            </span>
             <span className="shrink-0 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-1 rounded-full">
-              +{task.points}P
+              +{task.points} XP
             </span>
 
             {task.status === 'pending' ? (
