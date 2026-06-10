@@ -13,12 +13,12 @@ export default {
           '100%': { opacity: '0', transform: 'translateY(-52px) scale(1.25)' },
         },
         'flash-green': {
-          '0%, 100%': { boxShadow: 'none' },
-          '45%':      { boxShadow: '0 0 0 2px #34d399, 0 0 24px #34d39930' },
+          '0%, 100%': { boxShadow: 'none',                                              backgroundColor: '#1e293b' },
+          '45%':      { boxShadow: '0 0 0 2px #34d399, 0 0 24px #34d39940',            backgroundColor: '#0d2e20' },
         },
         'flash-purple': {
-          '0%, 100%': { boxShadow: 'none' },
-          '45%':      { boxShadow: '0 0 0 2px #a78bfa, 0 0 24px #a78bfa30' },
+          '0%, 100%': { boxShadow: 'none',                                              backgroundColor: '#1e293b' },
+          '45%':      { boxShadow: '0 0 0 2px #a78bfa, 0 0 24px #a78bfa40',            backgroundColor: '#1c1040' },
         },
         'toast-in': {
           '0%':   { opacity: '0', transform: 'translateX(16px) scale(0.95)' },
