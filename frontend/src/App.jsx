@@ -12,6 +12,8 @@ import { ToastProvider } from './context/ToastContext'
 function AppInner() {
   const [onboarded, setOnboarded] = useState(() => !!localStorage.getItem('lq_onboarded'))
   const [totalPoints, setTotalPoints] = useState(0)
+  // 온보딩 완료 후 페이지 컴포넌트를 강제 리마운트해 데이터를 새로 불러옴
+  const [pageKey, setPageKey] = useState(0)
 
   const refreshPoints = useCallback(async () => {
     const data = await api.getPoints()
@@ -22,20 +24,21 @@ function AppInner() {
 
   const handleOnboardingComplete = useCallback(() => {
     setOnboarded(true)
+    setPageKey(k => k + 1)
     refreshPoints()
   }, [refreshPoints])
 
   return (
     <>
       {!onboarded && <Onboarding onComplete={handleOnboardingComplete} />}
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-slate-900">
         <Navbar totalPoints={totalPoints} />
         <main className="max-w-3xl mx-auto px-4 py-8">
           <Routes>
             <Route path="/" element={<Navigate to="/tasks" replace />} />
-            <Route path="/tasks"   element={<Tasks   onPointsChange={refreshPoints} />} />
-            <Route path="/rewards" element={<Rewards onPointsChange={refreshPoints} totalPoints={totalPoints} />} />
-            <Route path="/history" element={<History />} />
+            <Route path="/tasks"   element={<Tasks   key={pageKey} onPointsChange={refreshPoints} />} />
+            <Route path="/rewards" element={<Rewards key={pageKey} onPointsChange={refreshPoints} totalPoints={totalPoints} />} />
+            <Route path="/history" element={<History key={pageKey} />} />
           </Routes>
         </main>
       </div>

@@ -26,10 +26,10 @@ export function getLevel(points, lang = 'en') {
 }
 
 const DIFFICULTIES = [
-  { max: 9,        en: 'Easy',   ko: '쉬움',   cls: 'text-slate-500 bg-slate-100' },
-  { max: 24,       en: 'Normal', ko: '보통',   cls: 'text-emerald-600 bg-emerald-50' },
-  { max: 49,       en: 'Hard',   ko: '어려움', cls: 'text-orange-600 bg-orange-50' },
-  { max: Infinity, en: 'Epic',   ko: '영웅급', cls: 'text-violet-700 bg-violet-100' },
+  { max: 9,        en: 'Easy',   ko: '쉬움',   cls: 'text-slate-400 bg-slate-700/60 border border-slate-600' },
+  { max: 24,       en: 'Normal', ko: '보통',   cls: 'text-emerald-400 bg-emerald-900/30 border border-emerald-800' },
+  { max: 49,       en: 'Hard',   ko: '어려움', cls: 'text-orange-400 bg-orange-900/30 border border-orange-800' },
+  { max: Infinity, en: 'Epic',   ko: '영웅급', cls: 'text-violet-400 bg-violet-900/40 border border-violet-700' },
 ]
 
 export function getDifficulty(points, lang = 'en') {

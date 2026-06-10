@@ -25,12 +25,15 @@ export default function Navbar({ totalPoints }) {
   ]
 
   return (
-    <nav className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10">
+    <nav className="bg-slate-900 border-b border-slate-700/50 sticky top-0 z-10 backdrop-blur-sm">
       <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
         {/* Left */}
         <div className="flex items-center gap-4">
-          <span className="font-bold text-violet-700 text-base tracking-tight select-none">⚔ Life Quest</span>
-          <div className="flex gap-1">
+          <span className="font-black text-violet-400 text-base tracking-tight select-none"
+            style={{ textShadow: '0 0 20px #7c3aed60' }}>
+            ⚔ Life Quest
+          </span>
+          <div className="flex gap-0.5">
             {links.map(({ to, label }) => (
               <NavLink
                 key={to}
@@ -38,8 +41,8 @@ export default function Navbar({ totalPoints }) {
                 className={({ isActive }) =>
                   `px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
                     isActive
-                      ? 'bg-violet-100 text-violet-700'
-                      : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                      ? 'bg-violet-900/60 text-violet-300 border border-violet-700/50'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
                   }`
                 }
               >
@@ -51,22 +54,21 @@ export default function Navbar({ totalPoints }) {
 
         {/* Right */}
         <div className="flex items-center gap-2">
-          {/* Language toggle */}
           <button
             onClick={toggle}
-            className="text-xs font-medium text-slate-500 hover:text-violet-600 bg-slate-100 hover:bg-violet-50 border border-slate-200 hover:border-violet-200 px-2.5 py-1.5 rounded-lg transition-all duration-150 active:scale-95 select-none"
+            className="text-xs font-medium text-slate-500 hover:text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-2.5 py-1.5 rounded-lg transition-all active:scale-95 select-none"
           >
             {lang === 'en' ? '한국어' : 'English'}
           </button>
 
           {/* Level badge */}
-          <div className="hidden sm:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-3 py-1.5">
+          <div className="hidden sm:flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-full px-3 py-1.5">
             <span className="text-sm leading-none">{lv.icon}</span>
             <div>
-              <div className="text-xs font-bold text-violet-700 leading-tight">
+              <div className="text-xs font-bold text-violet-300 leading-tight">
                 Lv.{lv.level} <span className="font-normal text-slate-500">{lv.title}</span>
               </div>
-              <div className="w-16 h-1 bg-slate-200 rounded-full overflow-hidden mt-0.5">
+              <div className="w-16 h-1 bg-slate-700 rounded-full overflow-hidden mt-0.5">
                 <div
                   className="h-full bg-violet-500 rounded-full transition-all duration-700"
                   style={{ width: `${lv.progress}%` }}
@@ -76,7 +78,7 @@ export default function Navbar({ totalPoints }) {
           </div>
 
           {/* XP badge */}
-          <div className={`flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 font-bold text-sm px-3 py-1.5 rounded-full transition-all ${bump ? 'animate-pop' : ''}`}>
+          <div className={`flex items-center gap-1 bg-amber-900/40 border border-amber-700/60 text-amber-400 font-bold text-sm px-3 py-1.5 rounded-full transition-all ${bump ? 'animate-pop' : ''}`}>
             <span>★</span>
             <span>{totalPoints.toLocaleString()} XP</span>
           </div>
